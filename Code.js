@@ -2,113 +2,11 @@ javascript: function make_message(message) {
   var html;
   if (message.type == "MESSAGE" || message.type == "TIPS" || is_album_message_type(message.type)) {
 
-      if (!is_album_message_type(message.type)) {
-      message.text = message.text.replace(new RegExp("<1>",'g'),"<img border=0 img width=25px src='https://stickers.wiki/static/stickers/icqkolobki/file_262719.gif'>"); 
+    if (!is_album_message_type(message.type)) {
+      message.text = message.text.replace(new RegExp("<(\\d+)>",'g'),"<img border=0 width=30px src='https://github.com/Dayset/Improved-chat-message-generation/raw/main/smileys/$1.gif'>"); 
     }
-      if (!is_album_message_type(message.type)) {
-      message.text = message.text.replace(new RegExp("<2>",'g'),"<img border=0 src=\/img\/smiles\/smile147.gif>"); 
-    }
-      if (!is_album_message_type(message.type)) {
-      message.text = message.text.replace(new RegExp("<3>",'g'),"<img border=0 src=\/img\/smiles\/smile103.gif>"); 
-    }
-      if (!is_album_message_type(message.type)) {
-      message.text = message.text.replace(new RegExp("<4>",'g'),"<img border=0 src=\/img\/smiles\/smile110.gif>"); 
-    }
-      if (!is_album_message_type(message.type)) {
-      message.text = message.text.replace(new RegExp("<5>",'g'),"<img border=0 src=\/img\/smiles\/smile114.gif>"); 
-    }
-      if (!is_album_message_type(message.type)) {
-      message.text = message.text.replace(new RegExp("<6>",'g'),"<img border=0 src=\/img\/smiles\/smile148.gif>"); 
-    }
-      if (!is_album_message_type(message.type)) {
-      message.text = message.text.replace(new RegExp("<7>",'g'),"<img border=0 src=\/img\/smiles\/smile111.gif>"); 
-    }
-      if (!is_album_message_type(message.type)) {
-      message.text = message.text.replace(new RegExp("<8>",'g'),"<img border=0 src=\/img\/smiles\/smile127.gif>"); 
-    }
-      if (!is_album_message_type(message.type)) {
-      message.text = message.text.replace(new RegExp("<9>",'g'),"<img border=0 src=\/img\/smiles\/smile129.gif>"); 
-    }
-      if (!is_album_message_type(message.type)) {
-      message.text = message.text.replace(new RegExp("<10>",'g'),"<img border=0 img width=40px src='https://stickers.wiki/static/stickers/icqkolobki/file_262753.gif'>"); 
-    }
-      if (!is_album_message_type(message.type)) {
-      message.text = message.text.replace(new RegExp("<11>",'g'),"<img border=0 src=\/img\/smiles\/smile140.gif>"); 
-    }
-      if (!is_album_message_type(message.type)) {
-      message.text = message.text.replace(new RegExp("<12>",'g'),"<img border=0 img width=25px src='https://stickers.wiki/static/stickers/icqkolobki/file_262718.gif'>"); 
-    }
-      if (!is_album_message_type(message.type)) {
-      message.text = message.text.replace(new RegExp("<13>",'g'),"<img border=0 img width=30px src='https://stickers.wiki/static/stickers/icqkolobki/file_262717.gif'>"); 
-    }
-      if (!is_album_message_type(message.type)) {
-      message.text = message.text.replace(new RegExp("<14>",'g'),"<img border=0 src=\/img\/smiles\/smile106.gif>"); 
-    }
-      if (!is_album_message_type(message.type)) {
-      message.text = message.text.replace(new RegExp("<15>",'g'),"<img border=0 src=\/img\/smiles\/smile142.gif>"); 
-    }
-      if (!is_album_message_type(message.type)) {
-      message.text = message.text.replace(new RegExp("<16>",'g'),"<img border=0 img width=25px src='https://stickers.wiki/static/stickers/icqkolobki/file_262721.gif'>"); 
-    }
-      if (!is_album_message_type(message.type)) {
-      message.text = message.text.replace(new RegExp("<17>",'g'),"<img border=0 img width=25px src='https://stickers.wiki/static/stickers/icqkolobki/file_262734.gif'>"); 
-    }
-      if (!is_album_message_type(message.type)) {
-      message.text = message.text.replace(new RegExp("<18>",'g'),"<img border=0 src=\/img\/smiles\/smile119.gif>"); 
-    }
-      if (!is_album_message_type(message.type)) {
-      message.text = message.text.replace(new RegExp("<19>",'g'),"<img border=0 src=\/img\/smiles\/smile141.gif>"); 
-    }
-      if (!is_album_message_type(message.type)) {
-      message.text = message.text.replace(new RegExp("<20>",'g'),"<img border=0 img width=30px src='https://stickers.wiki/static/stickers/icqkolobki/file_262716.gif'>"); 
-    }
-      if (!is_album_message_type(message.type)) {
-      message.text = message.text.replace(new RegExp("<21>",'g'),"<img border=0 src=\/img\/smiles\/smile113.gif>"); 
-    }
-      if (!is_album_message_type(message.type)) {
-      message.text = message.text.replace(new RegExp("<22>",'g'),"<img border=0 src=\/img\/smiles\/smile132.gif>"); 
-    }
-      if (!is_album_message_type(message.type)) {
-      message.text = message.text.replace(new RegExp("<23>",'g'),"<img border=0 src=\/img\/smiles\/smile150.gif>"); 
-    }
-      if (!is_album_message_type(message.type)) {
-      message.text = message.text.replace(new RegExp("<24>",'g'),"<img border=0 src=\/img\/smiles\/smile109.gif>"); 
-    }
-      if (!is_album_message_type(message.type)) {
-      message.text = message.text.replace(new RegExp("<25>",'g'),"<img border=0 src=\/img\/smiles\/smile149.gif>"); 
-    }
-      if (!is_album_message_type(message.type)) {
-      message.text = message.text.replace(new RegExp("<26>",'g'),"<img border=0 src=\/img\/smiles\/smile141.gif>"); 
-    }
-      if (!is_album_message_type(message.type)) {
-      message.text = message.text.replace(new RegExp("<27>",'g'),"<img border=0 src=\/img\/smiles\/smile104.gif>"); 
-    }
-      if (!is_album_message_type(message.type)) {
-      message.text = message.text.replace(new RegExp("<28>",'g'),"<img border=0 src=\/img\/smiles\/smile102.gif>"); 
-    }
-      if (!is_album_message_type(message.type)) {
-      message.text = message.text.replace(new RegExp("<29>",'g'),"<img border=0 src=\/img\/smiles\/smile136.gif>"); 
-    }
-      if (!is_album_message_type(message.type)) {
-      message.text = message.text.replace(new RegExp("<30>",'g'),"<img border=0 src=\/img\/smiles\/smile155.gif>"); 
-    }
-      if (!is_album_message_type(message.type)) {
-      message.text = message.text.replace(new RegExp("<31>",'g'),"<img border=0 img width=50px src='https://stickers.wiki/static/stickers/icqkolobki/file_262755.gif'>"); 
-    }
-      if (!is_album_message_type(message.type)) {
-      message.text = message.text.replace(new RegExp("<32>",'g'),"<img border=0 img width=50px src='https://stickers.wiki/static/stickers/icqkolobki/file_262737.gif'>"); 
-    }
-      if (!is_album_message_type(message.type)) {
-      message.text = message.text.replace(new RegExp("<33>",'g'),"<img border=0 src=\/img\/smiles\/smile146.gif>"); 
-    }
-      if (!is_album_message_type(message.type)) {
-      message.text = message.text.replace(new RegExp("<34>",'g'),"<img border=0 img width=40px src='https://stickers.wiki/static/stickers/icqkolobki/file_262738.gif'>"); 
-    }
-      if (!is_album_message_type(message.type)) {
-      message.text = message.text.replace(new RegExp("<35>",'g'),"<img border=0 img width=40px src='https://stickers.wiki/static/stickers/icqkolobki/file_262749.gif'>"); 
-    }
- 
-      if (!is_album_message_type(message.type)) {
+    
+    if (!is_album_message_type(message.type)) {
       message.text = message.text.replace(new RegExp("<(\\d+)>",'g'),"<img border=0 src=\/img\/smiles\/smile$1.gif>"); 
     }
 
