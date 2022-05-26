@@ -2,13 +2,14 @@ javascript: function make_message(message) {
   var html;
   if (message.type == "MESSAGE" || message.type == "TIPS" || is_album_message_type(message.type)) {
 
-    if (!is_album_message_type(message.type)) {
-      message.text = message.text.replace(new RegExp("<(\\d+)>",'g'),"<img border=0 width=30px src='https://github.com/Dayset/Improved-chat-message-generation/raw/main/smileys/$1.gif'>"); 
+    if (!is_album_message_type(message.type)) { 
+     message.text = message.text.replace(new RegExp("<(\\d+)>",'g'),"<img border=0 width=30px src='https://github.com/Dayset/Improved-chat-message-generation/raw/main/smileys/$1.gif'>"); 
     }
     
-    if (!is_album_message_type(message.type)) {
-      message.text = message.text.replace(new RegExp("<(\\d+)>",'g'),"<img border=0 src=\/img\/smiles\/smile$1.gif>"); 
-    }
+    // This part is broken for now, can't show proper smileys beyond 1-35. I need proper IF - if ("<(\\d+)>") or $1 < 35 - go my smiley folder, if > 35 use commented code.
+    //if (!is_album_message_type(message.type)) {
+    //  message.text = message.text.replace(new RegExp("<(\\d+)>",'g'),"<img border=0 src=\/img\/smiles\/smile$1.gif>"); 
+    //}
 
         var nick_style = "color:#" + message.color + "; font-weight:bold;";
         var message_style = "color:#" + message.color + ";";
