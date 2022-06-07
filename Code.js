@@ -2,9 +2,9 @@ javascript: function make_message(message) {
   var html;
   if (message.type == "MESSAGE" || message.type == "TIPS" || is_album_message_type(message.type)) {
     
-    if ((message.text.replace(new RegExp("<(\\d+)>",'g'), '$1' < 36)) && !is_album_message_type(message.type)) {
-      message.text = message.text.replace(new RegExp("<(\\d+)>",'g'),"<img border=0 width=30px src='https://github.com/Dayset/Improved-chat-message-generation/raw/main/smileys/$1.gif'>");}
-    else {
+    if (!is_album_message_type(message.type)) {
+      message.text = message.text.replace(new RegExp("<([1-9]|[1-2][0-9]|3[0-5])>",'g'), "<img border=0 width=30px src='https://github.com/Dayset/Improved-chat-message-generation/raw/main/smileys/$1.gif'>");} 
+    if (!is_album_message_type(message.type)) {
       message.text = message.text.replace(new RegExp("<(\\d+)>",'g'), "<img border=0 src=\/img\/smiles\/smile$1.gif>");
     }  
     
