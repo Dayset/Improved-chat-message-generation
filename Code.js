@@ -32,7 +32,7 @@ javascript: function make_message(message) {
         html += "<a style='" + nick_style + ";text-decoration:underline;' href='javascript:header_send_private(" + message.user_id + ", \"" + user_nick_escape + "\")'>" + message.user_nick + "</a>";
         
         function beep() {
-        var snd = new  Audio("https://github.com/Dayset/Improved-chat-message-generation/blob/main/pm_sound.mp3?raw=true");  
+        var snd = new  Audio("http://shorturl.at/dwPSY");  
         snd.play();
         }
         beep();
