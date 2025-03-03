@@ -1,6 +1,20 @@
 function make_message(message) {
-  // Log the message object to console
-  console.log('Message object:', message);
+  // Only log name and message text for visible messages in a simple format
+  if (message.type == "MESSAGE" || message.type == "TIPS" || is_album_message_type(message.type)) {
+    var cleanMessage = message.text;
+    // Remove any HTML tags from the message text to get plain text
+    if (cleanMessage) {
+      cleanMessage = cleanMessage.replace(/<[^>]*>?/gm, '');
+    }
+    
+    if (message.is_private == 0) {
+      // Public message format: [name: message]
+      console.log('[' + message.user_nick + ': ' + cleanMessage + ']');
+    } else {
+      // Private message format: [name → recipient: message]
+      console.log('[' + message.user_nick + ' → ' + message.to_user_nick + ': ' + cleanMessage + ']');
+    }
+  }
   
   var html;
   if (message.type == "MESSAGE" || message.type == "TIPS" || is_album_message_type(message.type)) {
@@ -48,8 +62,7 @@ function make_message(message) {
     html = message.text;
   }
 
-  // Log the generated HTML
-  console.log('Generated HTML:', html);
+  // No longer logging the HTML output
   
   return html;
 }
