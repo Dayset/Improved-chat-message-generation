@@ -1,0 +1,12 @@
+<div>
+      <form name="postmessage" onsubmit="return(dopostmessage());">
+        <input type="hidden" name="room_id" value="1">
+        <input type="hidden" name="to_user_id" value="0" autocomplete="off">
+        <input type="hidden" name="message_is_colorful" value="0">
+        <a href="javaScript:LastMess();"><img border="0" src="/img/last.gif" title="Предыдущее сообщение" width="11" height="11"></a>
+        <a href="javaScript:NextMess();"><img border="0" src="/img/next.gif" title="Следующее сообщение" width="11" height="11"></a>
+        &nbsp;&nbsp;
+        <input type="text" name="message" autofocus="on" maxlength="800" style="width:400px; height:20px; border:solid 1px gray;">
+        <input type="submit" class="btn btn-xs btn-primary" value="Сказать" style="font-size:15px;width:120px;">
+      </form>
+      </div>
