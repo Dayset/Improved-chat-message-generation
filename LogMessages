@@ -48,10 +48,10 @@ function addMessageToChat(html) {
       chatDiv.appendChild(msgDiv);
       chatDiv.scrollTop = chatDiv.scrollHeight;
     } else {
-      console.warn("Couldn't find a way to add the message to the chat. HTML generated:", html);
+      // Removed console warning
     }
   } catch(e) {
-    console.error("Error adding message to chat:", e);
+    // Removed error logging
   }
 }
 
@@ -65,40 +65,33 @@ function sendMessageToServer(message) {
       const inputField = messageForm.elements["message"];
       if (inputField) {
         inputField.value = message.text;
-        
-        // Try to call the dopostmessage() function directly
-        if (typeof dopostmessage === 'function') {
-          dopostmessage();
-        } else {
-          // If the function isn't directly accessible, submit the form
-          // which will trigger the onsubmit handler
-          messageForm.submit();
-        }
-        
-        // Clear the input field after sending
-        setTimeout(() => {
-          inputField.value = '';
-        }, 100);
-        
-        return true;
-      }
-    }
-    console.warn("Couldn't find the message form or input field.");
+
+        // Try to call the dopostmessage() function directly  
+        if (typeof dopostmessage === 'function') {  
+          dopostmessage();  
+        } else {  
+          // If the function isn't directly accessible, submit the form  
+          messageForm.submit();  
+        }  
+          
+        // Clear the input field after sending  
+        setTimeout(() => {  
+          inputField.value = '';  
+        }, 100);  
+          
+        return true;  
+      }  
+    }  
     return false;
   } catch(e) {
-    console.error("Error sending message to server:", e);
     return false;
   }
 }
 
-// Function to send a message from the console
-function sendConsoleMessage(text) {
-  if (!text || typeof text !== 'string' || text.trim() === '') {
-    console.error("Please provide a valid message text");
-    return "Error: Message cannot be empty";
-  }
-
-  console.log("Sending message: " + text);
+// Create a simplified version of sendConsoleMessage
+function m(text) {
+  // Convert any input to string
+  text = String(text);
   
   // Create a message object with required properties
   var consoleMessage = {
@@ -111,34 +104,25 @@ function sendConsoleMessage(text) {
     user_sex: getCurrentUserSex(),
     is_private: 0 // Default to public message
   };
-  
-  // Log the message in the simple format
-  console.log('[' + consoleMessage.user_nick + ': ' + text + ']');
-  
-  // Send the message to the server
-  const result = sendMessageToServer(consoleMessage);
-  
-  if (result) {
-    return "Message sent: " + text;
-  } else {
-    return "Failed to send message. Check console for errors.";
-  }
+
+  // Send the message to the server without any console logs
+  return sendMessageToServer(consoleMessage);
 }
 
-// Add the function to the window object so it can be called from console
-window.sendConsoleMessage = sendConsoleMessage;
+// Map the original function to the new one (for backward compatibility)
+window.sendConsoleMessage = function(text) {
+  return m(text);
+};
 
-// Log instructions to the console
-console.log('To send a message from console, type: sendConsoleMessage("your message here")');
+// Add the simplified function to the window object
+window.m = m;
 
+// Even shorter alias that accepts any type of input
+const $ = text => m(text);
+window.$ = $;
 
-// Add the function to the window object so it can be called from console
-window.sendConsoleMessage = sendConsoleMessage;
-
-// Log instructions to the console
-console.log('To send a message from console, type: sendConsoleMessage("your message here")');
-
-function make_message(message) {
+// Make all functions available globally
+window.make_message = function(message) {
   // Only log name and message text for visible messages in a simple format
   if (message.type == "MESSAGE" || message.type == "TIPS" || is_album_message_type(message.type)) {
     var cleanMessage = message.text;
@@ -146,63 +130,61 @@ function make_message(message) {
     if (cleanMessage) {
       cleanMessage = cleanMessage.replace(/<[^>]*>?/gm, '');
     }
-    
-    if (message.is_private == 0) {
-      // Public message format: [name: message]
-      console.log('[' + message.user_nick + ': ' + cleanMessage + ']');
-    } else {
-      // Private message format: [name → recipient: message]
-      console.log('[' + message.user_nick + ' → ' + message.to_user_nick + ': ' + cleanMessage + ']');
+
+    if (message.is_private == 0) {  
+      // Public message format: [name: message]  
+      // Removed console logging
+    } else {  
+      // Private message format: [name → recipient: message]  
+      // Removed console logging  
     }
   }
-  
+
   var html;
   if (message.type == "MESSAGE" || message.type == "TIPS" || is_album_message_type(message.type)) {
-    
-    if (!is_album_message_type(message.type)) {
-      message.text = message.text.replace(new RegExp("<([1-9]|[1-2][0-9]|3[0-5])>",'g'), "<img border=0 width=30px src='https://github.com/Dayset/Improved-chat-message-generation/raw/main/smileys/$1.gif'>");} 
-    if (!is_album_message_type(message.type)) {
-      message.text = message.text.replace(new RegExp("<(\\d+)>",'g'), "<img border=0 src=\/img\/smiles\/smile$1.gif>");
+
+    if (!is_album_message_type(message.type)) {  
+      message.text = message.text.replace(new RegExp("<([1-9]|[1-2][0-9]|3[0-5])>",'g'), "<img border=0 width=30px src='https://github.com/Dayset/Improved-chat-message-generation/raw/main/smileys/$1.gif'>");}   
+    if (!is_album_message_type(message.type)) {  
+      message.text = message.text.replace(new RegExp("<(\\d+)>",'g'), "<img border=0 src=\/img\/smiles\/smile$1.gif>");  
+    }    
+      
+    var nick_style = "color:#" + message.color + "; font-weight:bold;";  
+    var message_style = "color:#" + message.color + ";";  
+    var message_time = message.time.substr(11, 8);  
+
+    if (message.is_private == 0) {  
+
+        html = "<span class='" + (message.user_sex == 'f' ? "time_girl" : "time_boy") + "'>(" + message_time  + ")</span>";  
+    if (message.user_id > 0) {  
+        html += make_dropdown_menu_to_user(message, false);  
+        html += "<a style='" + nick_style + ";text-decoration:underline;' href='javascript:writeName(\"" + message.user_nick.replace(/&quot;/g,'\\\"') + "\")'>" + message.user_nick + "</a>";  
+      }  
+        html += "<span style='" + message_style + "'>: " + make_message_text(message) + "</span>";  
+
+    } else {  
+
+        var message_month = message.time.substr(5, 2);  
+        var message_day   = message.time.substr(8, 2);  
+        html = "<span class='" + (message.user_sex == 'f' ? "time_girl" : "time_boy") + "'>(" + message_day + '.' + message_month  + ', ' + message_time + ")</span>";  
+    if (message.user_id > 0) {  
+        html += make_dropdown_menu_to_user(message, true);  
+        var user_nick_escape = escapeQuot(escape_user_nick(message.user_nick));  
+        html += "<a style='" + nick_style + ";text-decoration:underline;' href='javascript:header_send_private(" + message.user_id + ", \"" + user_nick_escape + "\")'>" + message.user_nick + "</a>";  
+          
+        function beep() {  
+        var snd = new  Audio("http://shorturl.at/dwPSY");    
+        snd.play();  
+        }  
+        beep();  
     }  
-    
-    var nick_style = "color:#" + message.color + "; font-weight:bold;";
-    var message_style = "color:#" + message.color + ";";
-    var message_time = message.time.substr(11, 8);
-
-    if (message.is_private == 0) {
-
-        html = "<span class='" + (message.user_sex == 'f' ? "time_girl" : "time_boy") + "'>(" + message_time  + ")</span>";
-    if (message.user_id > 0) {
-        html += make_dropdown_menu_to_user(message, false);
-        html += "<a style='" + nick_style + ";text-decoration:underline;' href='javascript:writeName(\"" + message.user_nick.replace(/&quot;/g,'\\\"') + "\")'>" + message.user_nick + "</a>";
-      }
-        html += "<span style='" + message_style + "'>: " + make_message_text(message) + "</span>";
-
-    } else {
-
-        var message_month = message.time.substr(5, 2);
-        var message_day   = message.time.substr(8, 2);
-        html = "<span class='" + (message.user_sex == 'f' ? "time_girl" : "time_boy") + "'>(" + message_day + '.' + message_month  + ', ' + message_time + ")</span>";
-    if (message.user_id > 0) {
-        html += make_dropdown_menu_to_user(message, true);
-        var user_nick_escape = escapeQuot(escape_user_nick(message.user_nick));
-        html += "<a style='" + nick_style + ";text-decoration:underline;' href='javascript:header_send_private(" + message.user_id + ", \"" + user_nick_escape + "\")'>" + message.user_nick + "</a>";
-        
-        function beep() {
-        var snd = new  Audio("http://shorturl.at/dwPSY");  
-        snd.play();
-        }
-        beep();
-    }
-        html += "<span style='" + nick_style + "'>&rarr;" + message.to_user_nick + "</span>";
-        html += "<span style='" + message_style + "'>: " + make_message_text(message) + "</span>";
+        html += "<span style='" + nick_style + "'>&rarr;" + message.to_user_nick + "</span>";  
+        html += "<span style='" + message_style + "'>: " + make_message_text(message) + "</span>";  
     }
   }
   if (message.type == "READY") {
     html = message.text;
   }
 
-  // No longer logging the HTML output
-  
   return html;
 }
