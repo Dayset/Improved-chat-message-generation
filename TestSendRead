@@ -1,0 +1,46 @@
+// Simplified console message sender
+function sendConsoleMessage(text) {
+  if (!text || typeof text !== 'string' || text.trim() === '') {
+    console.error("Please provide a valid message text");
+    return;
+  }
+
+  // Automatically convert numbers to strings
+  text = String(text);
+
+  // Create a message object
+  var consoleMessage = {
+    type: "MESSAGE",
+    text: text,
+    color: getCurrentUserColor(),
+    time: new Date().toISOString(),
+    user_id: getCurrentUserId(),
+    user_nick: getCurrentUserNick(),
+    user_sex: getCurrentUserSex(),
+    is_private: 0
+  };
+
+  // Send the message to the server
+  sendMessageToServer(consoleMessage);
+}
+
+// Intercept direct console inputs
+window.consoleInputHandler = function(input) {
+  if (typeof input === 'string' || typeof input === 'number') {
+    sendConsoleMessage(input);
+  }
+};
+
+// Override console input
+window.addEventListener("keydown", function(event) {
+  if (event.key === "Enter" && event.target === document.activeElement && event.target.tagName !== "TEXTAREA") {
+    const input = event.target.value.trim();
+    if (input !== "") {
+      sendConsoleMessage(input);
+      event.target.value = ""; // Clear input field
+    }
+  }
+});
+
+// Log usage instructions
+console.log("Type your message directly in the console (e.g., 123 or 'Hello'). Hit Enter to send.");
