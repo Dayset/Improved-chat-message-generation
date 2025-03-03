@@ -1,0 +1,120 @@
+# Console Monitor and Automation Script
+# This script demonstrates how to interact with a console window
+
+Add-Type -AssemblyName System.Windows.Forms
+Add-Type -AssemblyName System.Drawing
+
+# Function to find a window by title
+function Find-Window {
+    param (
+        [Parameter(Mandatory=$true)]
+        [string]$WindowTitle
+    )
+    
+    # Get all windows with the specified title (partial match)
+    $windows = Get-Process | Where-Object { $_.MainWindowTitle -like "*$WindowTitle*" -and $_.MainWindowHandle -ne 0 }
+    
+    if ($windows -and $windows.Count -gt 0) {
+        Write-Host "Found $($windows.Count) matching windows"
+        return $windows[0]  # Return the first matching window
+    } else {
+        Write-Host "No windows found matching: $WindowTitle"
+        return $null
+    }
+}
+
+# Function to send keys to a specific window
+function Send-KeysToWindow {
+    param (
+        [Parameter(Mandatory=$true)]
+        [System.Diagnostics.Process]$Process,
+        
+        [Parameter(Mandatory=$true)]
+        [string]$Keys
+    )
+    
+    # Bring window to front
+    [void][System.Windows.Forms.NativeMethods, System.Windows.Forms]::SetForegroundWindow($Process.MainWindowHandle)
+    
+    # Small delay to ensure window is active
+    Start-Sleep -Milliseconds 300
+    
+    # Send keys
+    [System.Windows.Forms.SendKeys]::SendWait($Keys)
+    
+    Write-Host "Sent: $Keys to window: $($Process.MainWindowTitle)"
+}
+
+# Function to capture text from a specified region (experimental - requires OCR tools for reliable results)
+function Capture-ScreenRegion {
+    param (
+        [Parameter(Mandatory=$true)]
+        [System.Drawing.Rectangle]$Region
+    )
+    
+    $bitmap = New-Object System.Drawing.Bitmap $Region.Width, $Region.Height
+    $graphics = [System.Drawing.Graphics]::FromImage($bitmap)
+    $graphics.CopyFromScreen($Region.Left, $Region.Top, 0, 0, $Region.Size)
+    $graphics.Dispose()
+    
+    # Save to temp file for debugging
+    $tempFile = [System.IO.Path]::Combine([System.IO.Path]::GetTempPath(), "screen_capture_$(Get-Date -Format 'yyyyMMddHHmmss').png")
+    $bitmap.Save($tempFile, [System.Drawing.Imaging.ImageFormat]::Png)
+    
+    Write-Host "Captured screen region to: $tempFile"
+    return $tempFile
+}
+
+# Main script
+function Start-ConsoleAutomation {
+    param (
+        [string]$WindowTitle = "Console",
+        [int]$IntervalSeconds = 5,
+        [string]$CommandToSend = "$(123)"
+    )
+    
+    Write-Host "Starting console automation..."
+    Write-Host "Looking for windows matching: $WindowTitle"
+    Write-Host "Will send command: $CommandToSend every $IntervalSeconds seconds"
+    
+    # Run in a loop
+    try {
+        while ($true) {
+            # Find target window
+            $window = Find-Window -WindowTitle $WindowTitle
+            
+            if ($window) {
+                # Send our command followed by enter
+                Send-KeysToWindow -Process $window -Keys "$CommandToSend{ENTER}"
+            } else {
+                Write-Host "Target window not found. Waiting before retry..."
+            }
+            
+            # Wait for next interval
+            Start-Sleep -Seconds $IntervalSeconds
+        }
+    }
+    catch {
+        Write-Error "Error in automation: $_"
+    }
+    finally {
+        Write-Host "Automation stopped."
+    }
+}
+
+# Sample usage:
+# 1. Basic usage - find a window with "Console" in the title and send $(123) every 5 seconds
+# Start-ConsoleAutomation -WindowTitle "Console" -CommandToSend "$(123)" -IntervalSeconds 5
+
+# 2. Target a specific browser window with your chat application
+# Start-ConsoleAutomation -WindowTitle "Chat - Google Chrome" -CommandToSend "$(123)" -IntervalSeconds 10
+
+# 3. Watch for patterns in the console output (advanced usage - would require implementing OCR)
+# $consoleWindow = Find-Window -WindowTitle "Console"
+# $region = New-Object System.Drawing.Rectangle(100, 100, 400, 300)  # You'd need to adjust these coordinates
+# $capturedImage = Capture-ScreenRegion -Region $region
+# # Then use OCR tools to extract text from the captured image
+
+# Uncomment one of these to start automation:
+# Start-ConsoleAutomation -WindowTitle "Console" -CommandToSend "$(123)" -IntervalSeconds 5
+# Start-ConsoleAutomation -WindowTitle "Chrome" -CommandToSend "$(new Date().toLocaleTimeString())" -IntervalSeconds 10
