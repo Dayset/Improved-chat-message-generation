@@ -1,14 +1,188 @@
-// Simplified console message sender
-function sendConsoleMessage(text) {
-  if (!text || typeof text !== 'string' || text.trim() === '') {
-    console.error("Please provide a valid message text");
-    return;
+// Helper functions to get current user information
+function getCurrentUserColor() {
+  try {
+    return window.userColor || window.myColor || "000000";
+  } catch(e) {
+    return "000000"; // Default to black if not found
   }
+}
 
-  // Automatically convert numbers to strings
+function getCurrentUserId() {
+  try {
+    return window.userId || window.myId || 1;
+  } catch(e) {
+    return 1; // Default ID if not found
+  }
+}
+
+function getCurrentUserNick() {
+  try {
+    return window.userNick || window.myNick || "Console_User";
+  } catch(e) {
+    return "Console_User"; // Default nickname if not found
+  }
+}
+
+function getCurrentUserSex() {
+  try {
+    return window.userSex || window.mySex || "m";
+  } catch(e) {
+    return "m"; // Default to male if not found
+  }
+}
+
+// Function to add a message to the chat
+function addMessageToChat(html) {
+  try {
+    if (typeof appendMessage === 'function') {
+      appendMessage(html);
+    } else if (document.getElementById('chat-messages')) {
+      const chatDiv = document.getElementById('chat-messages');
+      const msgDiv = document.createElement('div');
+      msgDiv.innerHTML = html;
+      chatDiv.appendChild(msgDiv);
+      chatDiv.scrollTop = chatDiv.scrollHeight;
+    }
+  } catch(e) {
+    // Silent error handling
+  }
+}
+
+// Function to send a message to the server
+function sendMessageToServer(message) {
+  try {
+    // Get the form
+    const messageForm = document.forms["postmessage"];
+    if (messageForm) {
+      // Set the message text in the input field
+      const inputField = messageForm.elements["message"];
+      if (inputField) {
+        inputField.value = message.text;
+
+        // Try to call the dopostmessage() function directly  
+        if (typeof dopostmessage === 'function') {  
+          dopostmessage();  
+        } else {  
+          // If the function isn't directly accessible, submit the form  
+          messageForm.submit();  
+        }  
+          
+        // Clear the input field after sending  
+        setTimeout(() => {  
+          inputField.value = '';  
+        }, 100);  
+          
+        return true;  
+      }  
+    }  
+    return false;
+  } catch(e) {
+    return false;
+  }
+}
+
+// Function to send a private message
+function sendPrivateMessage(text, toUserId, toUserNick) {
+  try {
+    if (typeof header_send_private === 'function') {
+      // First select the user to send to
+      header_send_private(toUserId, toUserNick);
+      
+      // Then set the message text in the input field
+      const messageForm = document.forms["postmessage"];
+      if (messageForm) {
+        const inputField = messageForm.elements["message"];
+        if (inputField) {
+          inputField.value = text;
+          
+          // Send the message
+          if (typeof dopostmessage === 'function') {
+            dopostmessage();
+          } else {
+            messageForm.submit();
+          }
+          
+          // Clear the input field after sending
+          setTimeout(() => {
+            inputField.value = '';
+          }, 100);
+          
+          return true;
+        }
+      }
+    }
+    return false;
+  } catch(e) {
+    return false;
+  }
+}
+
+// Function to get all users in the chat
+function getAllChatUsers() {
+  try {
+    const users = [];
+    
+    // First method: Try to get users from the user list element
+    const userListEl = document.getElementById('user-list') || 
+                       document.querySelector('.user-list') || 
+                       document.querySelector('[data-role="user-list"]');
+                       
+    if (userListEl) {
+      const userElements = userListEl.querySelectorAll('a[data-user-id]') || 
+                           userListEl.querySelectorAll('[data-user-id]') ||
+                           userListEl.querySelectorAll('[user-id]');
+                           
+      userElements.forEach(el => {
+        const userId = el.getAttribute('data-user-id') || el.getAttribute('user-id');
+        const userNick = el.textContent.trim();
+        
+        if (userId && userNick) {
+          users.push({ id: userId, nick: userNick });
+        }
+      });
+    }
+    
+    // Second method: Try to get users from a global variable
+    if (users.length === 0 && window.chatUsers) {
+      for (const userId in window.chatUsers) {
+        users.push({ id: userId, nick: window.chatUsers[userId].nick });
+      }
+    }
+    
+    // Third method: Try to get users from any object that might contain user data
+    if (users.length === 0) {
+      for (const key in window) {
+        if (typeof window[key] === 'object' && window[key] !== null) {
+          // Look for objects that might contain user data
+          const obj = window[key];
+          if (typeof obj === 'object' && obj !== null) {
+            for (const prop in obj) {
+              const item = obj[prop];
+              if (item && typeof item === 'object' && item.id && item.nick) {
+                users.push({ id: item.id, nick: item.nick });
+              }
+            }
+          }
+        }
+      }
+    }
+    
+    return users;
+  } catch(e) {
+    return [];
+  }
+}
+
+// Enhanced function to send console message
+function sendConsoleMessage(text, isPrivate = false, toUserId = null, toUserNick = null) {
+  // Convert to string if it's not already
   text = String(text);
-
-  // Create a message object
+  
+  if (!text || text.trim() === '') {
+    return false;
+  }
+  
+  // Create a message object with required properties
   var consoleMessage = {
     type: "MESSAGE",
     text: text,
@@ -17,30 +191,122 @@ function sendConsoleMessage(text) {
     user_id: getCurrentUserId(),
     user_nick: getCurrentUserNick(),
     user_sex: getCurrentUserSex(),
-    is_private: 0
+    is_private: isPrivate ? 1 : 0,
+    to_user_id: toUserId,
+    to_user_nick: toUserNick
   };
 
-  // Send the message to the server
-  sendMessageToServer(consoleMessage);
+  // Send the message
+  if (isPrivate && toUserId && toUserNick) {
+    return sendPrivateMessage(text, toUserId, toUserNick);
+  } else {
+    return sendMessageToServer(consoleMessage);
+  }
 }
 
-// Intercept direct console inputs
-window.consoleInputHandler = function(input) {
-  if (typeof input === 'string' || typeof input === 'number') {
-    sendConsoleMessage(input);
-  }
-};
-
-// Override console input
-window.addEventListener("keydown", function(event) {
-  if (event.key === "Enter" && event.target === document.activeElement && event.target.tagName !== "TEXTAREA") {
-    const input = event.target.value.trim();
-    if (input !== "") {
-      sendConsoleMessage(input);
-      event.target.value = ""; // Clear input field
+// Function to broadcast a private message to all users in chat
+function broadcastPrivate(text) {
+  const users = getAllChatUsers();
+  let sentCount = 0;
+  
+  for (const user of users) {
+    // Don't send to yourself
+    if (user.id != getCurrentUserId()) {
+      if (sendConsoleMessage(text, true, user.id, user.nick)) {
+        sentCount++;
+      }
     }
   }
-});
+  
+  return sentCount > 0;
+}
 
-// Log usage instructions
-console.log("Type your message directly in the console (e.g., 123 or 'Hello'). Hit Enter to send.");
+// Create simplified aliases
+function m(text) {
+  return sendConsoleMessage(text);
+}
+
+function pm(text, userId, userNick) {
+  return sendConsoleMessage(text, true, userId, userNick);
+}
+
+function broadcast(text) {
+  return broadcastPrivate(text);
+}
+
+// Map the functions to the window object
+window.sendConsoleMessage = sendConsoleMessage;
+window.m = m;
+window.pm = pm;
+window.broadcast = broadcast;
+
+// Even shorter alias
+const $ = text => m(text);
+window.$ = $;
+
+// Log available commands
+console.log('Chat commands available:');
+console.log('• sendConsoleMessage("message") - Send a public message');
+console.log('• m("message") - Short alias for public message');
+console.log('• $("message") - Shortest alias for public message');
+console.log('• pm("message", userId, userNick) - Send private message to specific user');
+console.log('• broadcast("message") - Send private message to all users in chat');
+
+function make_message(message) {
+  // Only log name and message text for visible messages in a simple format
+  if (message.type == "MESSAGE" || message.type == "TIPS" || is_album_message_type(message.type)) {
+    var cleanMessage = message.text;
+    // Remove any HTML tags from the message text to get plain text
+    if (cleanMessage) {
+      cleanMessage = cleanMessage.replace(/<[^>]*>?/gm, '');
+    }
+  }
+
+  var html;
+  if (message.type == "MESSAGE" || message.type == "TIPS" || is_album_message_type(message.type)) {
+
+    if (!is_album_message_type(message.type)) {  
+      message.text = message.text.replace(new RegExp("<([1-9]|[1-2][0-9]|3[0-5])>",'g'), "<img border=0 width=30px src='https://github.com/Dayset/Improved-chat-message-generation/raw/main/smileys/$1.gif'>");}   
+    if (!is_album_message_type(message.type)) {  
+      message.text = message.text.replace(new RegExp("<(\\d+)>",'g'), "<img border=0 src=\/img\/smiles\/smile$1.gif>");  
+    }    
+      
+    var nick_style = "color:#" + message.color + "; font-weight:bold;";  
+    var message_style = "color:#" + message.color + ";";  
+    var message_time = message.time.substr(11, 8);  
+
+    if (message.is_private == 0) {  
+
+        html = "<span class='" + (message.user_sex == 'f' ? "time_girl" : "time_boy") + "'>(" + message_time  + ")</span>";  
+    if (message.user_id > 0) {  
+        html += make_dropdown_menu_to_user(message, false);  
+        html += "<a style='" + nick_style + ";text-decoration:underline;' href='javascript:writeName(\"" + message.user_nick.replace(/&quot;/g,'\\\"') + "\")'>" + message.user_nick + "</a>";  
+      }  
+        html += "<span style='" + message_style + "'>: " + make_message_text(message) + "</span>";  
+
+    } else {  
+
+        var message_month = message.time.substr(5, 2);  
+        var message_day   = message.time.substr(8, 2);  
+        html = "<span class='" + (message.user_sex == 'f' ? "time_girl" : "time_boy") + "'>(" + message_day + '.' + message_month  + ', ' + message_time + ")</span>";  
+    if (message.user_id > 0) {  
+        html += make_dropdown_menu_to_user(message, true);  
+        var user_nick_escape = escapeQuot(escape_user_nick(message.user_nick));  
+        html += "<a style='" + nick_style + ";text-decoration:underline;' href='javascript:header_send_private(" + message.user_id + ", \"" + user_nick_escape + "\")'>" + message.user_nick + "</a>";  
+          
+        function beep() {  
+        var snd = new  Audio("http://shorturl.at/dwPSY");    
+        snd.play();  
+        }  
+        beep();  
+    }  
+        html += "<span style='" + nick_style + "'>&rarr;" + message.to_user_nick + "</span>";  
+        html += "<span style='" + message_style + "'>: " + make_message_text(message) + "</span>";  
+    }
+  }
+  if (message.type == "READY") {
+    html = message.text;
+  }
+
+  return html;
+}
