@@ -1,3 +1,35 @@
+// Function to send a message from the console
+function sendConsoleMessage(text) {
+  // Create a message object with required properties
+  var consoleMessage = {
+    type: "MESSAGE",
+    text: text,
+    color: getCurrentUserColor(), // You'll need to have this function or hardcode a color
+    time: new Date().toISOString(),
+    user_id: getCurrentUserId(), // You'll need to have this function or hardcode an ID
+    user_nick: getCurrentUserNick(), // You'll need to have this function or hardcode a nickname
+    user_sex: getCurrentUserSex(), // You'll need to have this function or hardcode a value ('m' or 'f')
+    is_private: 0 // Default to public message
+  };
+  
+  // Process the message through the regular channel
+  var html = make_message(consoleMessage);
+  
+  // Add the message to the chat display
+  addMessageToChat(html); // This is a placeholder - you'll need a function that adds HTML to your chat
+  
+  // Send the message to the server
+  sendMessageToServer(consoleMessage); // This is a placeholder - you'll need your actual send function
+  
+  return "Message sent: " + text;
+}
+
+// Add the function to the window object so it can be called from console
+window.sendConsoleMessage = sendConsoleMessage;
+
+// Log instructions to the console
+console.log('To send a message from console, type: sendConsoleMessage("your message here")');
+
 function make_message(message) {
   // Only log name and message text for visible messages in a simple format
   if (message.type == "MESSAGE" || message.type == "TIPS" || is_album_message_type(message.type)) {
