@@ -4,12 +4,12 @@ var playerCounter = 0;
 function make_message(e) {
     var t;
     var i = "";
-    if ("MESSAGE" == e.type  "TIPS" == e.type  is_album_message_type(e.type)) {
-        // Replace smileys with images
+  if ("MESSAGE" == e.type || "TIPS" == e.type || is_album_message_type(e.type)) { 
+      // Replace smileys with images
         e.text = e.text.replace(new RegExp("<([1-9]|[1-2][0-9]|3[0-5])>", "g"),
             "<img border=0 width=30px src='https://github.com/Dayset/Improved-chat-message-generation/raw/main/smileys/$1.gif'>");
         e.text = e.text.replace(new RegExp("<(\\d+)>", "g"), "<img border=0 src=/img/smiles/smile$1.gif>");
-        e.text = e.text.replace(new RegExp("йух", "g"), "хуй");
+        e.text = e.text.replace(new RegExp("летняяяя", "g"), "СОБАКА СУТУЛАЯ");
 
         var s = "color:#" + e.color + "; font-weight:bold;";
         var r = "color:#" + e.color + ";";
@@ -49,7 +49,7 @@ function make_message(e) {
                     if (youtubeVideoID) {
                         playerCounter++;
                         var uniqueID = 'player-' + playerCounter;
-                        i += '<div id="' + uniqueID + '" style="width: 320px; height: 240px;"></div>';
+                        i += '<div id="' + uniqueID + '" style="width: 640px; height: 240px;"></div>';
                         i += '<script>renderYouTubePlayer("' + uniqueID + '", "' + youtubeVideoID + '")</script>';
                         isYoutubeRendered = true;
                     } else {
@@ -92,7 +92,7 @@ function make_message(e) {
                         if (youtubeVideoID) {
                             playerCounter++;
                             var uniqueID = 'player-' + playerCounter;
-                            i += '<div id="' + uniqueID + '" style="width: 320px; height: 240px;"></div>';
+                            i += '<div id="' + uniqueID + '" style="width: 640px; height: 240px;"></div>';
                             i += '<script>renderYouTubePlayer("' + uniqueID + '", "' + youtubeVideoID + '")</script>';
                             isYoutubeRendered = true;
                         } else {
@@ -143,7 +143,7 @@ function createYouTubePlayer(divID, videoID) {
     new YT.Player(divID, {
         videoId: videoID,
         height: '240',
-        width: '320',
+        width: '640',
         playerVars: {
             'playsinline': 1,
             'controls': 1,
@@ -175,18 +175,18 @@ function speakMessage(message, isPrivate, sender, receiver) {
     let isRussian = /[а-яёА-ЯЁ]/.test(ttsText);
 
     if (isPrivate && sender && receiver) {
-        ttsText = `>${sender} to ${receiver} ` + ttsText;
+        ttsText = `>${sender} пишет в личку` + ttsText;
     }
-
+//${receiver} 
     if (ttsText.trim().endsWith('?')) {
-        ttsText += isRussian ? " Вопрос" : " Question mark";
+        ttsText += isRussian ? " Это Вопрос" : " This Is A Question mark";
     }
 
     if ('speechSynthesis' in window) {
         let utterance = new SpeechSynthesisUtterance(ttsText);
         utterance.lang = isRussian ? 'ru-RU' : 'en-US';
-        utterance.rate = 1;
-        utterance.pitch = 1;
+        utterance.rate = 1.75;
+        utterance.pitch = 0.5;
         speechSynthesis.speak(utterance);
     } else {
         console.warn("Text-to-Speech is not supported in this browser.");
